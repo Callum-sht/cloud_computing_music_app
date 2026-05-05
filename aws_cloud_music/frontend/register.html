@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #333333;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .register-box {
+            width: 100%;
+            max-width: 400px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: #222222;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2f80ed;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #2f80ed;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1c6fd8;
+        }
+
+        .message {
+            min-height: 20px;
+            margin-top: 15px;
+            margin-bottom: 0;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .message.error {
+            color: #c0392b;
+        }
+
+        .message.success {
+            color: #2e7d32;
+        }
+
+        .login-link {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .login-link a {
+            color: #2f80ed;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <main class="page-container">
+        <section class="register-box">
+            <h1>Register</h1>
+
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="userName">Username</label>
+                    <input type="text" id="userName" name="userName">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password">
+                </div>
+
+                <button type="submit">Register</button>
+
+                <p id="message" class="message"></p>
+            </form>
+
+            <div class="login-link">
+                Already have an account? <a href="login.html">Login</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Replace this placeholder with your backend registration API endpoint.
+        const REGISTER_API_URL = "YOUR_REGISTER_API_ENDPOINT_HERE";
+
+        const registerForm = document.getElementById("registerForm");
+        const messageElement = document.getElementById("message");
+
+        // Display feedback messages for the user.
+        function showMessage(messageText, messageType) {
+            messageElement.textContent = messageText;
+            messageElement.className = "message " + messageType;
+        }
+
+        registerForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const userName = document.getElementById("userName").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            // Check that all required fields have a value.
+            if (email === "" || userName === "" || password === "") {
+                showMessage("Please fill in all fields", "error");
+                return;
+            }
+
+            const registrationData = {
+                email: email,
+                user_name: userName,
+                password: password
+            };
+
+            try {
+                const response = await fetch(REGISTER_API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(registrationData)
+                });
+
+                const result = await response.json();
+
+                if (result.success === true) {
+                    showMessage("Registration successful. Redirecting to login page...", "success");
+
+                    // Send the user to the login page after registration succeeds.
+                    setTimeout(function() {
+                        window.location.href = "login.html";
+                    }, 1000);
+                } else if (result.message === "The email already exists") {
+                    showMessage("The email already exists", "error");
+                } else {
+                    showMessage(result.message || "Registration failed", "error");
+                }
+            } catch (error) {
+                showMessage("Unexpected server error. Please try again later.", "error");
+            }
+        });
+    </script>
+</body>
+</html>
