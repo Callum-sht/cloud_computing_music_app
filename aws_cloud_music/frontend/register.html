@@ -142,7 +142,8 @@
 
     <script>
         // Replace this placeholder with your backend registration API endpoint.
-        const REGISTER_API_URL = "YOUR_REGISTER_API_ENDPOINT_HERE";
+        const API_BASE_URL = window.localStorage.getItem("apiBaseUrl") || "http://3.211.215.219";
+        const REGISTER_API_URL = `${API_BASE_URL}/auth/register`;
 
         const registerForm = document.getElementById("registerForm");
         const messageElement = document.getElementById("message");
