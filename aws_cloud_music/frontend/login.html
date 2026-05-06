@@ -37,8 +37,11 @@
 
     <script src="config.js"></script>
     <script>
+
+        // DELETE THIS and change it to your own URL endpoints (EC2, Lambda, etc)
         const LOGIN_API_URL = "YOUR_LOGIN_API_ENDPOINT_HERE";
-        const GET_API_URL = `${CONFIG.API_BASE_URL}?type=get`;
+        const GET_API_URL = "YOUR_BASE_API_URL_HERE";
+        // When pushing to github, delete this first
 
         const loginForm = document.getElementById("loginForm");
         const messageElement = document.getElementById("message");
