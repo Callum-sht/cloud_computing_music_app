@@ -35,9 +35,10 @@
         </section>
     </main>
 
+    <script src="config.js"></script>
     <script>
         const LOGIN_API_URL = "YOUR_LOGIN_API_ENDPOINT_HERE";
-        const GET_API_URL = "https://019efj0oyb.execute-api.us-east-1.amazonaws.com/Test/getAllUsersTest?type=get";
+        const GET_API_URL = `${CONFIG.API_BASE_URL}?type=get`;
 
         const loginForm = document.getElementById("loginForm");
         const messageElement = document.getElementById("message");
