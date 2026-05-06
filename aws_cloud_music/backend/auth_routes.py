@@ -8,11 +8,49 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
-    # Placeholder route for testing the backend setup.
-    return jsonify({
-        "success": True,
-        "message": "Login route is working"
-    })
+    data = request.get_json(silent=True)
+
+    if not data:
+        return jsonify({
+            "success": False,
+            "message": "Please fill in all fields"
+        }), 400
+
+    email = str(data.get("email", "")).strip()
+    password = str(data.get("password", "")).strip()
+
+    if not email or not password:
+        return jsonify({
+            "success": False,
+            "message": "Please fill in all fields"
+        }), 400
+
+    try:
+        dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
+        table = dynamodb.Table("login")
+
+        # Find the user by email.
+        response = table.get_item(Key={"email": email})
+        user = response.get("Item")
+
+        if not user or user.get("password") != password:
+            return jsonify({
+                "success": False,
+                "message": "email or password is invalid"
+            }), 401
+
+        return jsonify({
+            "success": True,
+            "message": "Login successful",
+            "email": user.get("email", ""),
+            "user_name": user.get("user_name", "")
+        })
+
+    except Exception:
+        return jsonify({
+            "success": False,
+            "message": "Login failed"
+        }), 500
 
 
 @auth_bp.route("/register", methods=["POST"])
