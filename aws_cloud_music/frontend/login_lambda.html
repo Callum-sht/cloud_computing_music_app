@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="page-container">
+        <section class="auth-box">
+            <h1>Login</h1>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password">
+                </div>
+
+                <button type="submit">Login</button>
+
+                <p id="message" class="message"></p>
+            </form>
+
+            <button id="fetchBtn" style="margin-top: 12px;">Fetch Data</button>
+
+            <div class="auth-link">
+                Don't have an account? <a href="register.html">Register</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const LOGIN_API_URL = "https://lklzexbmse.execute-api.us-east-1.amazonaws.com/LoginProduction/validate_user_login";
+        const GET_API_URL = "https://019efj0oyb.execute-api.us-east-1.amazonaws.com/Test/getAllUsersTest?type=get";
+
+        const loginForm = document.getElementById("loginForm");
+        const messageElement = document.getElementById("message");
+        const fetchBtn = document.getElementById("fetchBtn");
+
+        function showMessage(messageText, messageType) {
+            messageElement.textContent = messageText;
+            messageElement.className = "message " + messageType;
+        }
+
+        fetchBtn.addEventListener("click", async function() {
+            try {
+                const response = await fetch(GET_API_URL);
+                const result = await response.json();
+                console.log("Fetched data:", result);
+                showMessage("Data fetched! Check the console.", "success");
+            } catch (error) {
+                console.error("Fetch error:", error);
+                showMessage("Failed to fetch data.", "error");
+            }
+        });
+
+        loginForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            if (email === "" || password === "") {
+                showMessage("Please fill in all fields", "error");
+                return;
+            }
+
+            try {
+                const response = await fetch(LOGIN_API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ type: "login", email, password })
+                });
+
+                const result = await response.json();
+                console.log("Login response:", result);
+
+            } catch (error) {
+                console.error("Login error:", error);
+                showMessage("Unexpected server error. Please try again later.", "error");
+            }
+        });
+    </script>
+</body>
+</html>
