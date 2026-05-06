@@ -9,7 +9,7 @@
 </head>
 <body>
     <main class="page-container">
-        <section class="register-box">
+        <section class="auth-box">
             <h1>Register</h1>
 
             <form id="registerForm">
@@ -33,20 +33,18 @@
                 <p id="message" class="message"></p>
             </form>
 
-            <div class="login-link">
+            <div class="auth-link">
                 Already have an account? <a href="login.html">Login</a>
             </div>
         </section>
     </main>
 
     <script>
-        // Replace this placeholder with your backend registration API endpoint.
         const REGISTER_API_URL = "http://3.211.215.219/auth/register";
 
         const registerForm = document.getElementById("registerForm");
         const messageElement = document.getElementById("message");
 
-        // Display feedback messages for the user.
         function showMessage(messageText, messageType) {
             messageElement.textContent = messageText;
             messageElement.className = "message " + messageType;
@@ -59,7 +57,6 @@
             const userName = document.getElementById("userName").value.trim();
             const password = document.getElementById("password").value.trim();
 
-            // Check that all required fields have a value.
             if (email === "" || userName === "" || password === "") {
                 showMessage("Please fill in all fields", "error");
                 return;
@@ -85,7 +82,6 @@
                 if (result.success === true) {
                     showMessage("Registration successful. Redirecting to login page...", "success");
 
-                    // Send the user to the login page after registration succeeds.
                     setTimeout(function() {
                         window.location.href = "login.html";
                     }, 1000);
