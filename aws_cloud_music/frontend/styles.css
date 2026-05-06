@@ -98,3 +98,102 @@ button:hover {
 .auth-link a:hover {
     text-decoration: underline;
 }
+
+/**MAIN**/
+
+.page-container {
+    align-items: flex-start;
+}
+
+.main-container {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #dddddd;
+}
+
+.top-row h1 {
+    margin-bottom: 0;
+    text-align: left;
+}
+
+.logout-button {
+    width: auto;
+    padding: 8px 16px;
+    font-size: 14px;
+    background-color: #c0392b;
+}
+
+.logout-button:hover {
+    background-color: #a93226;
+}
+
+.section {
+    padding: 24px 0;
+    border-bottom: 1px solid #dddddd;
+}
+
+.section h2 {
+    margin-top: 0;
+}
+
+.query-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-end;
+}
+
+.query-fields .form-group {
+    width: 210px;
+}
+
+.music-item {
+    display: flex;
+    gap: 15px;
+    padding: 16px 0;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.music-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+}
+
+.music-details {
+    flex: 1;
+}
+
+.music-details h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.music-details p {
+    margin: 4px 0;
+}
+
+.search-button,
+.item-button {
+    width: auto;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.item-button {
+    margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+    .query-fields .form-group {
+        width: 100%;
+    }
+}
