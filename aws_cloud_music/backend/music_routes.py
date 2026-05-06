@@ -1,9 +1,58 @@
 import boto3
+from boto3.dynamodb.conditions import Key
 from flask import Blueprint, jsonify, request
 
 
 # Routes for music search and query features.
 music_bp = Blueprint("music", __name__, url_prefix="/music")
+
+
+def text_contains(item_value, search_value):
+    return search_value.lower() in str(item_value).lower()
+
+
+def read_all_pages(table, use_query, **kwargs):
+    items = []
+
+    if use_query:
+        response = table.query(**kwargs)
+    else:
+        response = table.scan(**kwargs)
+
+    items.extend(response.get("Items", []))
+
+    # Continue reading if DynamoDB returns paginated data.
+    while "LastEvaluatedKey" in response:
+        kwargs["ExclusiveStartKey"] = response["LastEvaluatedKey"]
+
+        if use_query:
+            response = table.query(**kwargs)
+        else:
+            response = table.scan(**kwargs)
+
+        items.extend(response.get("Items", []))
+
+    return items
+
+
+def item_matches(item, title, year, artist, album):
+    title_matches = not title or text_contains(item.get("title", ""), title)
+    year_matches = not year or year == str(item.get("year", "")).strip()
+    artist_matches = not artist or text_contains(item.get("artist", ""), artist)
+    album_matches = not album or text_contains(item.get("album", ""), album)
+
+    return title_matches and year_matches and artist_matches and album_matches
+
+
+def format_music_item(item):
+    return {
+        "song_id": item.get("song_id", ""),
+        "title": item.get("title", ""),
+        "artist": item.get("artist", ""),
+        "album": item.get("album", ""),
+        "year": item.get("year", ""),
+        "s3_img_url": item.get("s3_img_url", "")
+    }
 
 
 @music_bp.route("/query", methods=["POST"])
@@ -31,37 +80,34 @@ def query_music():
         dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
         table = dynamodb.Table("music")
 
-        all_items = []
-        response = table.scan()
-        all_items.extend(response.get("Items", []))
+        if artist and year:
+            items = read_all_pages(
+                table,
+                True,
+                IndexName="artist-year-index",
+                KeyConditionExpression=Key("artist").eq(artist) & Key("year").eq(year)
+            )
+        elif album:
+            items = read_all_pages(
+                table,
+                True,
+                IndexName="album-artist-index",
+                KeyConditionExpression=Key("album").eq(album)
+            )
+        elif artist:
+            items = read_all_pages(
+                table,
+                True,
+                KeyConditionExpression=Key("artist").eq(artist)
+            )
+        else:
+            items = read_all_pages(table, False)
 
-        # Continue scanning if DynamoDB returns paginated data.
-        while "LastEvaluatedKey" in response:
-            response = table.scan(ExclusiveStartKey=response["LastEvaluatedKey"])
-            all_items.extend(response.get("Items", []))
-
-        matched_items = []
-
-        for item in all_items:
-            item_title = str(item.get("title", ""))
-            item_year = str(item.get("year", "")).strip()
-            item_artist = str(item.get("artist", ""))
-            item_album = str(item.get("album", ""))
-
-            title_matches = not title or title.lower() in item_title.lower()
-            year_matches = not year or year == item_year
-            artist_matches = not artist or artist.lower() in item_artist.lower()
-            album_matches = not album or album.lower() in item_album.lower()
-
-            if title_matches and year_matches and artist_matches and album_matches:
-                matched_items.append({
-                    "song_id": item.get("song_id", ""),
-                    "title": item.get("title", ""),
-                    "artist": item.get("artist", ""),
-                    "album": item.get("album", ""),
-                    "year": item.get("year", ""),
-                    "s3_img_url": item.get("s3_img_url", "")
-                })
+        matched_items = [
+            format_music_item(item)
+            for item in items
+            if item_matches(item, title, year, artist, album)
+        ]
 
         if not matched_items:
             return jsonify({
