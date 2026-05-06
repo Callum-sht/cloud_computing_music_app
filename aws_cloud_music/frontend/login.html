@@ -35,12 +35,11 @@
         </section>
     </main>
 
-    <script src="config.js"></script>
     <script>
 
         // DELETE THIS and change it to your own URL endpoints (EC2, Lambda, etc)
         const LOGIN_API_URL = "YOUR_LOGIN_API_ENDPOINT_HERE";
-        const GET_API_URL = "YOUR_BASE_API_URL_HERE";
+        const GET_API_URL = "http://3.211.https://019efj0oyb.execute-api.us-east-1.amazonaws.com/Test/getAllUsersTest.219?type=get";
         // When pushing to github, delete this first
 
         const loginForm = document.getElementById("loginForm");
@@ -63,12 +62,7 @@
                 showMessage("Failed to fetch data.", "error");
             }
         });
-
-        function showMessage(messageText, messageType) {
-            messageElement.textContent = messageText;
-            messageElement.className = "message " + messageType;
-        }
-
+        
         loginForm.addEventListener("submit", async function(event) {
             event.preventDefault();
 
