@@ -30,7 +30,7 @@
             <button id="fetchBtn" style="margin-top: 12px;">Fetch Data</button>
 
             <div class="auth-link">
-                Don't have an account? <a href="register.html">Register</a>
+                Don't have an account? <a href="register_lambda.html">Register</a>
             </div>
         </section>
     </main>
@@ -81,10 +81,9 @@
                 const result = await response.json();
                 console.log("Login response:", result);
 
-                if (response.ok) {
+                if (result.success === true) {
                     localStorage.setItem("user_name", result.user_name);
                     localStorage.setItem("user_email", email);
-
                     window.location.href = "main_lambda.html";
                 } else {
                     showMessage(result.message || "Login failed. Please try again.", "error");

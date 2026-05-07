@@ -3,18 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Register</title>
+
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <main class="page-container">
         <section class="auth-box">
-            <h1>Login</h1>
+            <h1>Register</h1>
 
-            <form id="loginForm">
+            <form id="registerForm">
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="userName">Username</label>
+                    <input type="text" id="userName" name="userName">
                 </div>
 
                 <div class="form-group">
@@ -22,80 +28,69 @@
                     <input type="password" id="password" name="password">
                 </div>
 
-                <button type="submit">Login</button>
+                <button type="submit">Register</button>
 
                 <p id="message" class="message"></p>
             </form>
 
-            <button id="fetchBtn" style="margin-top: 12px;">Fetch Data</button>
-
             <div class="auth-link">
-                Don't have an account? <a href="register.html">Register</a>
+                Already have an account? <a href="login_lambda.html">Login</a>
             </div>
         </section>
     </main>
 
     <script>
+        const REGISTER_API_URL = "https://7ope38gpe5.execute-api.us-east-1.amazonaws.com/Production/register_user_music";
 
-        // DELETE THIS and change it to your own URL endpoints (EC2, Lambda, etc)
-        const LOGIN_API_URL = "YOUR_LOGIN_API_ENDPOINT_HERE";
-        const GET_API_URL = "YOUR_GET_API_ENDPOINT_HERE";
-        // When pushing to github, delete this first
-
-        const loginForm = document.getElementById("loginForm");
+        const registerForm = document.getElementById("registerForm");
         const messageElement = document.getElementById("message");
-        const fetchBtn = document.getElementById("fetchBtn");
 
         function showMessage(messageText, messageType) {
             messageElement.textContent = messageText;
             messageElement.className = "message " + messageType;
         }
 
-        fetchBtn.addEventListener("click", async function() {
-            try {
-                const response = await fetch(GET_API_URL);
-                const result = await response.json();
-                console.log("Fetched data:", result);
-                showMessage("Data fetched! Check the console.", "success");
-            } catch (error) {
-                console.error("Fetch error:", error);
-                showMessage("Failed to fetch data.", "error");
-            }
-        });
-
-        loginForm.addEventListener("submit", async function(event) {
+        registerForm.addEventListener("submit", async function(event) {
             event.preventDefault();
 
             const email = document.getElementById("email").value.trim();
+            const userName = document.getElementById("userName").value.trim();
             const password = document.getElementById("password").value.trim();
 
-            if (email === "" || password === "") {
+            if (email === "" || userName === "" || password === "") {
                 showMessage("Please fill in all fields", "error");
                 return;
             }
 
+            const registrationData = {
+                email: email,
+                user_name: userName,
+                password: password
+            };
+
             try {
-                const response = await fetch(LOGIN_API_URL, {
+                const response = await fetch(REGISTER_API_URL, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify(registrationData)
                 });
 
                 const result = await response.json();
-                console.log("Login response:", result);
 
                 if (result.success === true) {
-                    localStorage.setItem("user_name", result.user_name);
-                    localStorage.setItem("user_email", email);
-                    window.location.href = "main_lambda.html";
-                } else {
-                    showMessage(result.message || "Login failed. Please try again.", "error");
-                }
+                    showMessage("Registration successful. Redirecting to login page...", "success");
 
+                    setTimeout(function() {
+                        window.location.href = "login_lambda.html";
+                    }, 1000);
+                } else if (result.message === "The email already exists") {
+                    showMessage("The email already exists", "error");
+                } else {
+                    showMessage(result.message || "Registration failed", "error");
+                }
             } catch (error) {
-                console.error("Login error:", error);
                 showMessage("Unexpected server error. Please try again later.", "error");
             }
         });
