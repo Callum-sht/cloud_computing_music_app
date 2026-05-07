@@ -65,9 +65,9 @@
 
     <script>
         const QUERY_API_URL = "https://6dl3c1igtf.execute-api.us-east-1.amazonaws.com/Production/main_query_api";
-        const LIST_SUBSCRIPTIONS_API_URL = "http://3.211.215.219/subscription/list";
-        const ADD_SUBSCRIPTION_API_URL = "http://3.211.215.219/subscription/add";
-        const REMOVE_SUBSCRIPTION_API_URL = "http://3.211.215.219/subscription/remove";
+        const LIST_SUBSCRIPTIONS_API_URL = "https://jia3bhycse.execute-api.us-east-1.amazonaws.com/Production/main_list_subscriptions";
+        const ADD_SUBSCRIPTION_API_URL = "https://riyp8w5rwe.execute-api.us-east-1.amazonaws.com/Production/main_add_subscription";
+        const REMOVE_SUBSCRIPTION_API_URL = "https://nhkf26iy88.execute-api.us-east-1.amazonaws.com/Production/main_remove_subscription";
 
         const userName = localStorage.getItem("user_name");
         const userEmail = localStorage.getItem("user_email");
@@ -281,12 +281,12 @@
                     return;
                 }
 
-showMessage(queryMessage, result.message || "Query successful", "success");
-renderMusicItems(queryResults, songs, "Subscribe", "subscribe-button");
-            } catch (error) {
-                showMessage(queryMessage, "Query failed", "error");
-            }
-        });
+        showMessage(queryMessage, result.message || "Query successful", "success");
+        renderMusicItems(queryResults, songs, "Subscribe", "subscribe-button");
+                    } catch (error) {
+                        showMessage(queryMessage, "Query failed", "error");
+                    }
+                });
 
         queryResults.addEventListener("click", function(event) {
             if (event.target.classList.contains("subscribe-button")) {
