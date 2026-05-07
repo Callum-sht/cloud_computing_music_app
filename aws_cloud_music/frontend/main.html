@@ -303,8 +303,8 @@
                 const result = await response.json();
 
                 if (result.success === true) {
-                    showAndScrollMessage(queryMessage, result.message || "Subscribed successfully", "success");
-                    loadSubscriptions();
+                    await loadSubscriptions();
+                    showAndScrollMessage(queryMessage, result.message || "Subscribed successfully", "success");        
                 } else {
                     showAndScrollMessage(queryMessage, result.message || "Subscription failed", "error");
                 }
@@ -329,8 +329,8 @@
                 const result = await response.json();
 
                 if (result.success === true) {
+                    await loadSubscriptions();
                     showAndScrollMessage(subscriptionMessage, result.message || "Removed successfully", "success");
-                    loadSubscriptions();
                 } else {
                     showAndScrollMessage(subscriptionMessage, result.message || "Remove failed", "error");
                 }
