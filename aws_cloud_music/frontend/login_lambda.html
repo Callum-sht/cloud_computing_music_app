@@ -81,6 +81,14 @@
                 const result = await response.json();
                 console.log("Login response:", result);
 
+                if (response.ok) {
+                    localStorage.setItem("user_name", result.user_name);
+                    localStorage.setItem("user_email", email);
+
+                    window.location.href = "main_lambda.html";
+                } else {
+                    showMessage(result.message || "Login failed. Please try again.", "error");
+                }
             } catch (error) {
                 console.error("Login error:", error);
                 showMessage("Unexpected server error. Please try again later.", "error");

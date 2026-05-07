@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main</title>
+
+    <link rel="stylesheet" href="styles.css">
+    <!-- <style>
+        .page-container {
+            align-items: flex-start;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .top-row h1 {
+            margin-bottom: 0;
+            text-align: left;
+        }
+
+        .logout-button {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #c0392b;
+        }
+
+        .logout-button:hover {
+            background-color: #a93226;
+        }
+
+        .section {
+            padding: 24px 0;
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .section h2 {
+            margin-top: 0;
+        }
+
+        .query-fields {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+
+        .query-fields .form-group {
+            width: 210px;
+        }
+
+        .music-item {
+            display: flex;
+            gap: 15px;
+            padding: 16px 0;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+        .music-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+        }
+
+        .music-details {
+            flex: 1;
+        }
+
+        .music-details h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+
+        .music-details p {
+            margin: 4px 0;
+        }
+
+        .search-button,
+        .item-button {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .item-button {
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .query-fields .form-group {
+                width: 100%;
+            }
+        }
+    </style> -->
+</head>
+<body>
+    <main class="page-container">
+        <div class="main-container">
+            <div class="top-row">
+                <h1>Welcome</h1>
+                <button type="button" id="logoutButton" class="logout-button">Logout</button>
+            </div>
+
+            <section>
+                <p><strong>User Name:</strong> <span id="userNameText"></span></p>
+                <p><strong>Email:</strong> <span id="userEmailText"></span></p>
+                <p id="pageMessage" class="message"></p>
+            </section>
+
+            <section class="section">
+                <h2>My Subscriptions</h2>
+                <div id="subscriptionList"></div>
+                <p id="subscriptionMessage" class="message"></p>
+            </section>
+
+            <section class="section">
+                <h2>Search Music</h2>
+
+                <form id="queryForm">
+                    <div class="query-fields">
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" id="title" name="title">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="year">Year</label>
+                            <input type="text" id="year" name="year">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="artist">Artist</label>
+                            <input type="text" id="artist" name="artist">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="album">Album</label>
+                            <input type="text" id="album" name="album">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="search-button">Search</button>
+                    <p id="queryMessage" class="message"></p>
+                </form>
+
+                <div id="queryResults"></div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const QUERY_API_URL = "http://3.211.215.219/music/query";
+        const LIST_SUBSCRIPTIONS_API_URL = "http://3.211.215.219/subscription/list";
+        const ADD_SUBSCRIPTION_API_URL = "http://3.211.215.219/subscription/add";
+        const REMOVE_SUBSCRIPTION_API_URL = "http://3.211.215.219/subscription/remove";
+
+        const userName = localStorage.getItem("user_name");
+        const userEmail = localStorage.getItem("user_email");
+
+        const userNameText = document.getElementById("userNameText");
+        const userEmailText = document.getElementById("userEmailText");
+        const pageMessage = document.getElementById("pageMessage");
+        const subscriptionMessage = document.getElementById("subscriptionMessage");
+        const queryMessage = document.getElementById("queryMessage");
+        const subscriptionList = document.getElementById("subscriptionList");
+        const queryResults = document.getElementById("queryResults");
+        const queryForm = document.getElementById("queryForm");
+        const logoutButton = document.getElementById("logoutButton");
+
+        if (!userName || !userEmail) {
+            window.location.href = "login_lambda.html";
+        } else {
+            userNameText.textContent = userName;
+            userEmailText.textContent = userEmail;
+        }
+
+        function showMessage(element, messageText, messageType) {
+            element.textContent = messageText;
+            element.className = "message " + messageType;
+        }
+
+        function clearMessage(element) {
+            element.textContent = "";
+            element.className = "message";
+        }
+
+        function createMusicItem(song, buttonText, buttonClass) {
+            const item = document.createElement("div");
+            item.className = "music-item";
+
+            const image = document.createElement("img");
+            image.className = "music-image";
+            image.src = song.s3_img_url || "";
+            image.alt = song.artist || "Artist image";
+
+            const details = document.createElement("div");
+            details.className = "music-details";
+
+            const title = document.createElement("h3");
+            title.textContent = song.title || "";
+
+            const artist = document.createElement("p");
+            artist.textContent = "Artist: " + (song.artist || "");
+
+            const album = document.createElement("p");
+            album.textContent = "Album: " + (song.album || "");
+
+            const year = document.createElement("p");
+            year.textContent = "Year: " + (song.year || "");
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "item-button " + buttonClass;
+            button.textContent = buttonText;
+            button.dataset.songId = song.song_id || "";
+
+            details.appendChild(title);
+            details.appendChild(artist);
+            details.appendChild(album);
+            details.appendChild(year);
+            details.appendChild(button);
+
+            item.appendChild(image);
+            item.appendChild(details);
+
+            return item;
+        }
+
+        function renderMusicItems(container, songs, buttonText, buttonClass) {
+            container.innerHTML = "";
+
+            songs.forEach(function(song) {
+                const item = createMusicItem(song, buttonText, buttonClass);
+                container.appendChild(item);
+            });
+        }
+
+        async function loadSubscriptions() {
+            clearMessage(subscriptionMessage);
+            subscriptionList.innerHTML = "";
+
+            try {
+                const response = await fetch(LIST_SUBSCRIPTIONS_API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        user_email: userEmail
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success !== true) {
+                    showMessage(subscriptionMessage, result.message || "Failed to load subscriptions", "error");
+                    return;
+                }
+
+                const songs = result.items || [];
+
+                if (songs.length === 0) {
+                    subscriptionList.textContent = "No subscribed music yet.";
+                    return;
+                }
+
+                renderMusicItems(subscriptionList, songs, "Remove", "remove-button");
+            } catch (error) {
+                showMessage(subscriptionMessage, "Failed to load subscriptions", "error");
+            }
+        }
+
+        async function addSubscription(songId) {
+            try {
+                const response = await fetch(ADD_SUBSCRIPTION_API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        user_email: userEmail,
+                        song_id: songId
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success === true) {
+                    await loadSubscriptions();
+                    showMessage(queryMessage, result.message || "Subscribed successfully", "success");
+                } else {
+                    showMessage(queryMessage, result.message || "Subscription failed", "error");
+                }
+            } catch (error) {
+                showMessage(queryMessage, "Subscription failed", "error");
+            }
+        }
+
+        async function removeSubscription(songId) {
+            try {
+                const response = await fetch(REMOVE_SUBSCRIPTION_API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        user_email: userEmail,
+                        song_id: songId
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success === true) {
+                    await loadSubscriptions();
+                    showMessage(subscriptionMessage, result.message || "Removed successfully", "success");
+                } else {
+                    showMessage(subscriptionMessage, result.message || "Remove failed", "error");
+                }
+            } catch (error) {
+                showMessage(subscriptionMessage, "Remove failed", "error");
+            }
+        }
+
+        queryForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+            clearMessage(queryMessage);
+            queryResults.innerHTML = "";
+
+            const title = document.getElementById("title").value.trim();
+            const year = document.getElementById("year").value.trim();
+            const artist = document.getElementById("artist").value.trim();
+            const album = document.getElementById("album").value.trim();
+
+            if (title === "" && year === "" && artist === "" && album === "") {
+                showMessage(queryMessage, "Please fill in at least one field", "error");
+                return;
+            }
+
+            try {
+                const response = await fetch(QUERY_API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        title: title,
+                        year: year,
+                        artist: artist,
+                        album: album
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success !== true) {
+                    showMessage(queryMessage, result.message || "Query failed", "error");
+                    return;
+                }
+
+                const songs = result.items || [];
+
+                if (songs.length === 0) {
+                    showMessage(queryMessage, "No result is retrieved. Please query again", "error");
+                    return;
+                }
+
+                showMessage(queryMessage, result.message || "Query successful", "success");
+                renderMusicItems(queryResults, songs, "Subscribe", "subscribe-button");
+            } catch (error) {
+                showMessage(queryMessage, "Query failed", "error");
+            }
+        });
+
+        queryResults.addEventListener("click", function(event) {
+            if (event.target.classList.contains("subscribe-button")) {
+                addSubscription(event.target.dataset.songId);
+            }
+        });
+
+        subscriptionList.addEventListener("click", function(event) {
+            if (event.target.classList.contains("remove-button")) {
+                removeSubscription(event.target.dataset.songId);
+            }
+        });
+
+        logoutButton.addEventListener("click", function() {
+            localStorage.removeItem("user_name");
+            localStorage.removeItem("user_email");
+            window.location.href = "login_lambda.html";
+        });
+
+        if (userName && userEmail) {
+            loadSubscriptions();
+        }
+    </script>
+</body>
+</html>
