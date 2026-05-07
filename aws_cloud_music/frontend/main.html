@@ -191,11 +191,6 @@
             element.className = "message " + messageType;
         }
 
-        function showAndScrollMessage(element, messageText, messageType) {
-            showMessage(element, messageText, messageType);
-            element.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        }
-
         function clearMessage(element) {
             element.textContent = "";
             element.className = "message";
@@ -270,7 +265,7 @@
                 const result = await response.json();
 
                 if (result.success !== true) {
-                    showAndScrollMessage(subscriptionMessage, result.message || "Failed to load subscriptions", "error");
+                    showMessage(subscriptionMessage, result.message || "Failed to load subscriptions", "error");
                     return;
                 }
 
@@ -283,7 +278,7 @@
 
                 renderMusicItems(subscriptionList, songs, "Remove", "remove-button");
             } catch (error) {
-                showAndScrollMessage(subscriptionMessage, "Failed to load subscriptions", "error");
+                showMessage(subscriptionMessage, "Failed to load subscriptions", "error");
             }
         }
 
@@ -304,12 +299,12 @@
 
                 if (result.success === true) {
                     await loadSubscriptions();
-                    showAndScrollMessage(queryMessage, result.message || "Subscribed successfully", "success");        
+                    showMessage(queryMessage, result.message || "Subscribed successfully", "success");
                 } else {
-                    showAndScrollMessage(queryMessage, result.message || "Subscription failed", "error");
+                    showMessage(queryMessage, result.message || "Subscription failed", "error");
                 }
             } catch (error) {
-                showAndScrollMessage(queryMessage, "Subscription failed", "error");
+                showMessage(queryMessage, "Subscription failed", "error");
             }
         }
 
@@ -330,12 +325,12 @@
 
                 if (result.success === true) {
                     await loadSubscriptions();
-                    showAndScrollMessage(subscriptionMessage, result.message || "Removed successfully", "success");
+                    showMessage(subscriptionMessage, result.message || "Removed successfully", "success");
                 } else {
-                    showAndScrollMessage(subscriptionMessage, result.message || "Remove failed", "error");
+                    showMessage(subscriptionMessage, result.message || "Remove failed", "error");
                 }
             } catch (error) {
-                showAndScrollMessage(subscriptionMessage, "Remove failed", "error");
+                showMessage(subscriptionMessage, "Remove failed", "error");
             }
         }
 
@@ -350,7 +345,7 @@
             const album = document.getElementById("album").value.trim();
 
             if (title === "" && year === "" && artist === "" && album === "") {
-                showAndScrollMessage(queryMessage, "Please fill in at least one field", "error");
+                showMessage(queryMessage, "Please fill in at least one field", "error");
                 return;
             }
 
@@ -371,21 +366,21 @@
                 const result = await response.json();
 
                 if (result.success !== true) {
-                    showAndScrollMessage(queryMessage, result.message || "Query failed", "error");
+                    showMessage(queryMessage, result.message || "Query failed", "error");
                     return;
                 }
 
                 const songs = result.items || [];
 
                 if (songs.length === 0) {
-                    showAndScrollMessage(queryMessage, "No result is retrieved. Please query again", "error");
+                    showMessage(queryMessage, "No result is retrieved. Please query again", "error");
                     return;
                 }
 
-                showAndScrollMessage(queryMessage, result.message || "Query successful", "success");
+                showMessage(queryMessage, result.message || "Query successful", "success");
                 renderMusicItems(queryResults, songs, "Subscribe", "subscribe-button");
             } catch (error) {
-                showAndScrollMessage(queryMessage, "Query failed", "error");
+                showMessage(queryMessage, "Query failed", "error");
             }
         });
 
