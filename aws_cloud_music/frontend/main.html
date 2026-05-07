@@ -180,7 +180,7 @@
         const logoutButton = document.getElementById("logoutButton");
 
         if (!userName || !userEmail) {
-            window.location.href = "login.html";
+            window.location.href = "login_lambda.html";
         } else {
             userNameText.textContent = userName;
             userEmailText.textContent = userEmail;
@@ -364,7 +364,8 @@
                 });
 
                 const result = await response.json();
-
+                console.log("RAW RESPONSE:", JSON.stringify(result));
+                
                 if (result.success !== true) {
                     showMessage(queryMessage, result.message || "Query failed", "error");
                     return;
@@ -377,8 +378,8 @@
                     return;
                 }
 
-                showMessage(queryMessage, result.message || "Query successful", "success");
-                renderMusicItems(queryResults, songs, "Subscribe", "subscribe-button");
+showMessage(queryMessage, result.message || "Query successful", "success");
+renderMusicItems(queryResults, songs, "Subscribe", "subscribe-button");
             } catch (error) {
                 showMessage(queryMessage, "Query failed", "error");
             }
@@ -399,7 +400,7 @@
         logoutButton.addEventListener("click", function() {
             localStorage.removeItem("user_name");
             localStorage.removeItem("user_email");
-            window.location.href = "login.html";
+            window.location.href = "login_lambda.html";
         });
 
         if (userName && userEmail) {
