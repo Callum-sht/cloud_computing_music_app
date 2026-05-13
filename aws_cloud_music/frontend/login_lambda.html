@@ -27,7 +27,7 @@
                 <p id="message" class="message"></p>
             </form>
 
-            <button id="fetchBtn" style="margin-top: 12px;">Fetch Data</button>
+            <!-- <button id="fetchBtn" style="margin-top: 12px;">Fetch Data</button> -->
 
             <div class="auth-link">
                 Don't have an account? <a href="register_lambda.html">Register</a>
@@ -48,17 +48,17 @@
             messageElement.className = "message " + messageType;
         }
 
-        fetchBtn.addEventListener("click", async function() {
-            try {
-                const response = await fetch(GET_API_URL);
-                const result = await response.json();
-                console.log("Fetched data:", result);
-                showMessage("Data fetched! Check the console.", "success");
-            } catch (error) {
-                console.error("Fetch error:", error);
-                showMessage("Failed to fetch data.", "error");
-            }
-        });
+        // fetchBtn.addEventListener("click", async function() {
+        //     try {
+        //         const response = await fetch(GET_API_URL);
+        //         const result = await response.json();
+        //         console.log("Fetched data:", result);
+        //         showMessage("Data fetched! Check the console.", "success");
+        //     } catch (error) {
+        //         console.error("Fetch error:", error);
+        //         showMessage("Failed to fetch data.", "error");
+        //     }
+        // });
 
         loginForm.addEventListener("submit", async function(event) {
             event.preventDefault();
